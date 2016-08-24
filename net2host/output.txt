@@ -1,0 +1,9 @@
+root@Vijay:/media/vijay/G/Network/endianness# gcc ntohl.c
+root@Vijay:/media/vijay/G/Network/endianness# ./a.out 
+The val of a   is 77889911
+The val of ans is 11998877
+root@Vijay:/media/vijay/G/Network/endianness# gcc ntohl.c
+root@Vijay:/media/vijay/G/Network/endianness# ./a.out 
+The val of a   is 77889911
+The val of ans is 11998877
+

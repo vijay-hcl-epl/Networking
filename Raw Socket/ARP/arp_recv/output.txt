@@ -1,0 +1,39 @@
+Ethernet Header
+	|-Source Address : 3C-97-0E-38-D6-8A
+	|-Destination Address : FF-FF-FF-FF-FF-FF
+	|-Protocol : 806
+
+
+ARP Header
+	|-htype : 1
+	|-ptype : 800 
+	|-hlen : 6 
+	|-plen : 4 
+	|-opcode : 1
+	|-sender_mac : 3C-97-0E-38-D6-8A
+	|-sender_ip : 192.168.17.3
+	|-target_mac : 00-00-00-00-00-00
+	|-target_ip : 192.168.17.2
+
+
+
+
+
+
+Ethernet Header
+	|-Source Address : 00-1D-72-46-A3-DC
+	|-Destination Address : 3C-97-0E-38-D6-8A
+	|-Protocol : 806
+
+
+ARP Header
+	|-htype : 1
+	|-ptype : 800 
+	|-hlen : 6 
+	|-plen : 4 
+	|-opcode : 2
+	|-sender_mac : 00-1D-72-46-A3-DC
+	|-sender_ip : 192.168.17.2
+	|-target_mac : 3C-97-0E-38-D6-8A
+	|-target_ip : 192.168.17.3
+

@@ -1,0 +1,180 @@
+Networking Notes
+=================
+
+May 11
+-------
+
+OSI Layers
+-----------
+7. APP
+6. Presentation
+5. Session Layer
+4. Transport - UDP,TCP which uses fnptr registered to Network Layer. 
+3. Network - or IP Layer; Has a header which  defines the length of payload in the frame
+2. Data Link - or L2 Layer. deals with physical layer, Address finding, Error and flow control. Switch, Hub operates with this layer
+1. Physical - copper, fibre cable etc
+
+To remember this, remember Please Do Not Trust Sales People Advice
+
+In Linux netif_Rx does that "Policy" handling
+
+TCP/IP Layer
+-------------
+4. APP - Combines session and Presentation
+3. Transport - Telnet uses this with Port. Ports are specifi to application
+2. Network
+1. Data Link - Also has Physical Layer - Data coming out of here can be captured using raw socket
+
+Data Link has Ethernet 
+MAC Address - Media Access Control. It has 6 bytes. 1st 3 bytes has OUI - Organizationally unique Identifier. The last 3 bytes are sequence numbers
+
+Ex - 00:11:22:33:44:55
+or - 00-11-22-33-44-55. Linux mostly uses ":"
+
+MAC ADdress types
+-----------------
+Every interface has MAC address hardcoded by Manufacturers
+
+1. Unicast - To send to a specific host in a LAN - LSB is 0 in MAC addr
+2. Multicast - To send to multiple hosts in a LAN - LSB is 1 in MAC addr. Just like sending mail to a group in a domain. For every protocol there is a multi cast address
+3. Broadcast - To broadcast to every host in a LAN - all values are FF in MAC addr. Just like sending mail to everyone in domain 
+
+MAC Controller
+---------------
+1. Every interface has MAC Controller which can be programmed for multi cast addr based on the guidelines in data sheet. This will be memory mapped to the processor. 
+2. Multi Cast Addr can be programmed in here. Thus when Multi cast frames are received, this acts as a filter in accepting and rejecting the frame based on the frames multi cast address and the multi cast address programmed.
+
+There are 2 modes in receiving Packets. Data coming out of ethernet are called frames
+
+1. Non Promiscous mode - Only receives registered frames. Ex: Dedicated unicast, Multi cast and broad cast
+2. Promiscous mode - Receive all frames. MAC controller does not filter and accept all frames. Ex Host A sends something to B which can be received in B using wireshark
+
+Frame format
+------------
+Dst MAC - 6bytes
+Src MAC - 6 bytes
+Type/Len - Previously Length was used but it does not indicate the type(ex IP or ARP). So Type is used nowadays. Ex if type is IP or ARP, then the length will be mentioned in the header of IP or ARP.
+Payload - varies
+CRC - 4 bytes
+
+PC1-->IP1-->MAC1===>MAC2-->IP2-->PC2
+
+Max size of ether net frame is 1522. Frames with greater than 1522 are called Jumbo frames
+
+Sometimes in front of Frame format, preamble followed by start of frame(00) is attached. It announces that frame is gonna be sent. Deals with physical media
+
+Linux
+------
+registerPDU(type, fnptr); when MAC controller receives packet, calls fnptr(skbuff);
+
+Frame Switching
+----------------
+Switches can forward the frame. There are 2 types
+
+1. Cut through - Once frames are received upto Dst MAC, MAC ctrlr(??) starts transmitting. This enhances performance and ensures low latency.
+2. STore forward. Wait for the full frame
+
+Assignments
+-----------
+1. Write a Linux program which listens on ethernet interface and parse the frame and print headers DstMAC,SrcMAC,type and 1st 20 bytes of payload
+2. Check NIC card supports Jumbo frames
+3. Write a raw socket program 
+DstMAC - 01:22:55:EE:11
+SrcMAC - 01:22:55:EE:22
+type - 800
+length - 200
+Payload - 0;
+
+STUDY
+=====
+http://opensourceforu.com/2015/03/a-guide-to-using-raw-sockets/
+\\<IPAddress>\c$ or \\<PCName>\c$
+RAW Socket
+----------
+1. A raw socket bypasses the normal TCP/IP processing and sends the packets to the specific user application.
+2. Other sockets like stream sockets and data gram sockets receive data from the transport layer that contains no headers but only the payload. This means that there is no information about the source IP address and MAC address. If applications running on the same machine or on different machines are communicating, then they are only exchanging data.
+3. The purpose of a raw socket is absolutely different. A raw socket allows an application to directly access lower level protocols, which means a raw socket receives un-extracted packets (see Figure 2). There is no need to provide the port and IP address to a raw socket, unlike in the case of stream and datagram sockets??
+
+Program Raw Socket
+------------------
+1. Should be root
+2. To open a socket, you have to know three things ? the socket family, socket type and protocol. For a raw socket, the socket family is AF_PACKET, the socket type is SOCK_RAW and for the protocol, see the if_ether.h header file. To receive all packets, the macro is ETH_P_ALL and to receive IP packets, the macro is ETH_P_IP for the protocol field.
+
+int sock_r;
+sock_r=socket(AF_PACKET,SOCK_RAW,htons(ETH_P_ALL));
+if(sock_r<0)
+{
+printf(?error in socket\n?);
+return -1;
+}
+
+Generic Network packet
+----------------------
+ETHERNET HEADER--NETWORK HEADER--TRANSPORT HEADER--DATA
+
+Queries
+-------
+1. WHy IP addresses is not matching with host?
+2. WHy IP addresses are different everytime?
+3. Why iP ver is not 4?
+4. Why no MAC addr for PPP interface?
+5. Why dest MAC is FF-FF-FF-FF-FF-FF on eth receive?
+6. Why dest IP is Destination IP : 192.168.17.255 in eth receive? 
+
+
+May 13
+-------
+1. Browse for ether_header,ethtype,ethernet frame format, ntohl, htonl
+2. Network Byte order is always Big Endian - Why??
+3. Host Byte order - Endianness of CPU or host.
+4. Use ntohl, htonl wherever necessary in LE Arch host. In BE Arch host, these macros ntohl(x) expands to X and no conversion takes place. So portability will not get affected.
+5. Even in socket programming between Process A and B in a same machine has to use ntohl & etc
+6. Promiscous and non promiscous mode deals only with MAC layer.
+7. *ptr = () buff; ptr = ptr + size of eth header to traverse to IP Header
+8. Whatever the type of network connection; ethernet frames will be received. For Ex: when using USB dongles, I think CDC_NCM class drivers convers the ethernet frames into URB(USB Packets) and VV.
+
+HUB
+----
+Consider hosts A,B,C,D in a network
+1. Layer 1 device
+2. Ethernet is a shared medium. Every host in the network receives preamble(announcement before packet sending) and DMAC(that is first 6 bytes)
+3. MAC takes care of listening and sending packets
+4. If D and C starts to tx at the same time, then collisions might happen. To avoid this, it waits for some random time(not a common value of time) and then again tx.
+5. When A and B are communicating, C and D cannot communicate. Single collision and broadcast
+
+Switch
+------
+http://nettipps.de/2011/03/05/spanning-tree-works/
+Consider hosts A,B,C,D in ports E1,E2,E3,E4 respectively in a network
+1. Layer 2 device since it has intelligency to parse L2 headers
+2. It has an ASIC inside
+3. It has a table called MAC address table/L2 table/L2 cache/FDB-Forward dataBase. It is a mapping of MAC address and ports
+4. Before any activity, the MAC-Address-Table is empty. Once Host A sends data to Host B, the MAC-Address-Table
+gets populated with Host A’s MAC address.
+5. Because the switch does not know which port the destination MAC address is associated with, it floods the frame out all of the ports except the one it arrived on (in this case Port E1). It does a Destination MAC Look up failure(DLF).
+6. When Host B replies to Host A, the switch first learns the MAC address associated with Host B and the port
+to which it is attached. At this point, the switch will only forward the frame out of Port E1 because the MACaddress table has already been populated with Host A’s MAC and its associated port. 
+7. Eventually, all host MAC addresses will be learned in the same way, and the MAC-Address-Table will be
+populated.
+8. Every 300 secs the switch expects something from all ports, otherwise the table entry is removed after 300 secs. The again if A wants to send the table will be updated
+9. In case if A is modified to a different port E5, it is possible that the switch wrongly forwards packet to E1. 
+10. When A and B are communicating, C and D can communicate. Anybody can communicate with anyone. Since it has tx and rx queues data will be bufferred. Collision might happen between port(i.e switches) and hosts. So no. of collisions depends on no. of hosts in a switch
+11. Communication between switch and host is half duplex, so collisions might happen
+12. Use the MAC address of Gateway to communicate with any host lying in other network
+
+L3 switch or multi layer
+------------------------
+1. Except for MAC address table, it has routing address table
+2. Routing lookup needs to be done by SW
+3. ARP - Address resolution protocol.To find the MAC address of a host
+4. ARP Table - Mapping of IP address and MAC address?? ; To remember Name - IP address; Phone no. - MAC address
+
+General
+--------
+1. Reliable/connection oriented transmission - Acknowledgement for every transfer - TCP?
+2. unreliable/connectionless - vv UDP?
+3. Another name for broadcast - Flooding
+3. Every layer has a raw socket and switches. Nowadays everyone uses switch. HCL uses L#+ switches. Cost might be increased for higher layer switches. Higher layer switches might also have lower layer headers
+4. 
+
+All new switch book.

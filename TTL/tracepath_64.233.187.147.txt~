@@ -1,0 +1,27 @@
+root@vijay-laptop:/media/sda6/Learning_docs/Net/Networking/May20/Network/TTL# tracepath 64.233.187.147
+ 1?: [LOCALHOST]                                         pmtu 1500
+ 1:  www.Reliance.home                                     7.834ms 
+ 1:  www.Reliance.home                                     7.188ms 
+ 2:  220.224.141.145                                     1433.409ms 
+ 2:  220.224.141.145                                     5436.067ms 
+ 3:  115.255.236.85                                      100.268ms 
+ 4:  124.124.239.189                                     596.373ms 
+ 5:  no reply
+ 5:  115.255.252.226                                     3675.318ms asymm  4 
+ 5:  115.255.252.226                                     8162.689ms asymm  4 
+ 5:  115.255.252.226                                     12165.896ms asymm  4 
+ 8:  no reply
+ 9:  no reply
+10:  no reply
+11:  no reply
+12:  no reply
+13:  no reply
+14:  no reply
+15:  no reply
+16:  no reply
+17:  no reply
+18:  no reply
+19:  no reply
+^C
+root@vijay-laptop:/media/sda6/Learning_docs/Net/Networking/May20/Network/TTL# 
+

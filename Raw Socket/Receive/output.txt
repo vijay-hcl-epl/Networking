@@ -1,0 +1,19 @@
+
+Ethernet Header
+	|-Source Address : 40-00-2B-06-E2-1E
+	|-Destination Address : 45-00-00-34-71-9E
+	|-Protocol : 5636
+
+
+IP Header
+	|-Version : 11
+	|-Internet Header Length : 12 DWORDS or 48 Bytes
+	|-Type Of Service : 208
+	|-Total Length : 25919 Bytes
+	|-Identification : 41889
+	|-Time To Live : 210
+	|-Protocol : 43
+	|-Header Checksum : 24486
+	|-Source IP : 48.157.224.155
+	|-Destination IP : 59.26.128.16
+
