@@ -1,0 +1,11 @@
+Virtual Box - 5.1.22
+Ubuntu - 16.04.4 LTS
+Kernel - 4.9.98
+
+Procedure:
+==========
+1. Replace the file loopback.c with updated one.
+2. make
+3. make install
+4. watch 'dmesg | tail -20' in one window
+5. ping 127.0.0.1 in another window
